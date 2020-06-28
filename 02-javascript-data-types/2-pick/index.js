@@ -16,7 +16,7 @@ export const pick = (obj, ...fields) => {
   }
   else{
     obj = new Object ();
-   fields.map(function(a, index)  {
+   fields.map(a => {
           obj[a] = a;
       })
   }
