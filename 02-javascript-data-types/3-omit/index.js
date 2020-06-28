@@ -11,7 +11,7 @@ export const omit = (obj, ...fields) => {
   }
   array = array.split(' ');
   let result = array.filter( z => fields.indexOf(z) !== -1 );
-  console.log(result);
+
   if(result.length == 0){
     return obj;
   }
