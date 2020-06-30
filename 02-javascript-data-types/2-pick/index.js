@@ -5,20 +5,21 @@
  * @returns {object} - returns the new object
  */
 export const pick = (obj, ...fields) => {
-  let array = [];
+  let array = [],
+    strForArray = '';
   for(const [key, value] of Object.entries(obj)){
-    array +=`${value} `;
+    strForArray +=`${value} `;
   }
-  array = array.split(' ');
+  array = strForArray.split(' ');
   let result = array.filter( z => fields.indexOf(z) !== -1 );
   if(result.length == 0){
-    return obj ={};
+    return obj = {};
   }
   else{
-    obj = new Object ();
+    const obj = {} ;
    fields.map(a => {
           obj[a] = a;
       })
+    return obj;
   }
-  return obj;
 };
