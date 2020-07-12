@@ -6,11 +6,11 @@
 export function invertObj(obj) {
   let object = {};
   if (obj === null){
-    return object = {};
+    return object;
   }
   else if ( obj !== null && obj !== undefined) {
-    let keys = Object.keys(obj),
-      values = Object.values(obj);
+      const keys = Object.keys(obj);
+      const values = Object.values(obj);
     for(let i = 0; i < keys.length; i++){
       object[values[i]] = keys[i];
     }
