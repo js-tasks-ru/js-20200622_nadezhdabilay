@@ -1,65 +1,92 @@
 export default class ColumnChart {
   element;
-  subElement = {};
+  subElements = {};
   chartHeight = 50;
-  data = '';
 
-  constructor(data) {
-    this.data = data.data;
-    this.label = data.label;
-    this.value = data.value;
-    this.link = data.link;
+  constructor({
+    data = [],
+    label = '',
+    link = '',
+    value = 0
+  } = {}) {
+    this.data = data;
+    this.label = label;
+    this.link = link;
+    this.value = value;
+
+    this.render();
   }
 
-  out() {
-    if (this.label == 'orders') {
-      const element = document.getElementById('orders');
-      return this.renderColumn(element);
-    } else if (this.label == 'sales') {
-      const element = document.getElementById('sales');
-      return this.renderColumn(element);
-    } else if (this.label == 'customers') {
-      const element = document.getElementById('customers');
-      return this.renderColumn(element);
-    }
+  getColumnBody(data) {
+    const maxValue = Math.max(...data);
+
+    return data
+    .map(item => {
+      const scale = this.chartHeight / maxValue;
+      const percent = (item / maxValue * 100).toFixed(0);
+
+      return `<div style="--value: ${Math.floor(item * scale)}" data-tooltip="${percent}%"></div>`;
+    })
+    .join('');
   }
 
-  renderColumn(element) {
-    let column_chart, column_img, label_chart, value_chart, label_link;
-      element.classList += " column-chart__container";
-      if (this.link != undefined){
-        label_link = document.createElement('div');
-        label_link.classList += ' column-chart__link';
-        label_link.innerHTML += this.link;
-        element.appendChild(label_link);
-      }
-      label_chart = document.createElement('div');
-      label_chart.classList += ' column-chart__title';
-      label_chart.innerHTML += this.label;
-      element.appendChild(label_chart);
-      value_chart = document.createElement('div');
-      value_chart.classList += ' column-chart__header';
-      value_chart.innerHTML += this.value;
-      element.appendChild(value_chart);
-      column_chart = document.createElement('div');
-      column_chart.style.marginTop = 50 + 'px';
-      column_chart.classList += 'column-chart__chart';
-      element.appendChild(column_chart);
-    if (this.data == ''){
-      column_chart.remove();
-      element.classList.remove("column-chart__container");
-      element.classList += " column-chart_loading";
-      column_img = document.createElement('div');
-      column_img.classList += " column-chart__container";
-      element.appendChild(column_img);
+  getLink() {
+    return this.link ? `<a class="column-chart__link" href="${this.link}">View all</a>` : '';
+  }
+
+  get template() {
+    return `
+      <div class="column-chart column-chart_loading" style="--chart-height: ${this.chartHeight}">
+        <div class="column-chart__title">
+          Total ${this.label}
+          ${this.getLink()}
+        </div>
+        <div class="column-chart__container">
+          <div data-element="header" class="column-chart__header">
+            ${this.value}
+          </div>
+          <div data-element="body" class="column-chart__chart">
+            ${this.getColumnBody(this.data)}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  render() {
+    const element = document.createElement('div');
+
+    element.innerHTML = this.template;
+    this.element = element.firstElementChild;
+
+    if (this.data.length) {
+      this.element.classList.remove('column-chart_loading');
     }
-    else{
-      return this.data.map(a => {
-        const column = document.createElement("div");
-        column.innerHTML += '';
-        column.style.height = a + 'px';
-        column_chart.appendChild(column);
-      });
-    }
+
+    this.subElements = this.getSubElements(this.element);
+  }
+
+  getSubElements(element) {
+    const elements = element.querySelectorAll('[data-element]');
+
+    return [...elements].reduce((accum, subElement) => {
+      accum[subElement.dataset.element] = subElement;
+
+      return accum;
+    }, {});
+  }
+
+  update({headerData, bodyData}) {
+    this.subElements.header.textContent = headerData;
+    this.subElements.body.innerHTML = this.getColumnBody(bodyData);
+  }
+
+  remove () {
+    this.element.remove();
+  }
+
+  destroy() {
+    this.remove();
+    this.subElements = {};
   }
 }
