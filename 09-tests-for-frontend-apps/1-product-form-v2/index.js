@@ -337,3 +337,5 @@ export default class ProductForm {
     this.element.remove();
   }
 }
+
+
